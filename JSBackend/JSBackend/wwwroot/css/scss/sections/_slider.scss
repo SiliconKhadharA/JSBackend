@@ -1,0 +1,100 @@
+.slider {
+    .container {
+        max-width: 100%;
+        height: auto; 
+        background-image: linear-gradient(to right, $gray-900 50%, $white 50%);
+        position: relative;
+        z-index: 0; 
+
+    
+        &::after {
+            content: '';
+            position: absolute;
+            right: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: $theme-secondary;
+            z-index: 0; 
+        }
+
+        h1 {
+            padding-top: 110px;
+            padding-bottom: 70px;
+      
+            @include h6;
+            text-align: center;
+            padding-right: 20px;
+
+            @include lg {
+                @include h2;
+                padding-right: 0;
+            }
+
+            span:first-child {
+                padding-left: 25px;
+                color: $white;
+            }
+
+            span:last-child {
+                padding-left: 15px;
+                color: $black;
+            }
+        }
+    }
+
+    .content {
+        position: relative; 
+        width: 100%;
+        min-height: 500px;
+
+        @include lg {
+            width: 100%; 
+            min-height: 640px;
+            padding-bottom: 80px; 
+        }
+  
+
+        .image-container {
+                width: 100%; 
+                height: 100%; 
+                position: relative;
+                z-index: -1; 
+                display: flex;
+                justify-content: center; 
+                align-items: center; 
+      
+                img {
+                width: 100%; 
+                height: auto; 
+
+                    @include lg {
+                        width: 49%;
+                    }
+                }
+        }
+
+        .middle-img {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 1; 
+        }
+
+        .half-screen.light-mode {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 49.8%;
+                z-index: 0;
+                
+
+                @include lg {
+                    width: 24.4%; 
+                    right: 469px; 
+                    top: 0;
+                }
+        }
+    }
+}

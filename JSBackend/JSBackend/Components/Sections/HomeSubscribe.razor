@@ -1,0 +1,151 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using JSBackend.Client.Models
+
+
+<div id="Subscribe" class="subscribe">
+    <div class="container">
+        <div class="content">
+            <h1>Don't Want to Miss Anything</h1>
+            <img src="/Images/Sub-Image.svg" alt="swirl arrow">
+        </div>
+
+        <EditForm id="form-check" FormName="subscribeform" Model="SubscribeForm" OnValidSubmit="@OnValidSubmit" novalidate>
+            <DataAnnotationsValidator />
+            <div class="choose-newsletter">
+
+
+                <div id="form-Newsletter" class="checkbox">
+                    <h1>Sign up for<br>Newsletters</h1>
+                    <div class="checkboxes">
+
+
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="SubscribeForm.DailyNewsletter" id="DailyNewsletter" />
+                            <label class="form-check-label" for="SubscribeForm.DailyNewsletter">DailyNewsletter</label>
+                        </div>
+
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="SubscribeForm.AdvertisingUpdates" id="AdvertisingUpdates" />
+                            <label class="form-check-label" for="SubscribeForm.AdvertisingUpdates">AdvertisingUpdates</label>
+                        </div>
+
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="SubscribeForm.WeekInReview" id="WeekInReview" />
+                            <label class="form-check-label" for="SubscribeForm.WeekInReview">WeekInReview</label>
+                        </div>
+
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="SubscribeForm.EventUpdates" id="EventUpdates" />
+                            <label class="form-check-label" for="SubscribeForm.EventUpdates">EventUpdates</label>
+                        </div>
+
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="SubscribeForm.StartupWeekly" id="StartupWeekly" />
+                            <label class="form-check-label" for="SubscribeForm.StartupWeekly">StartupWeekly</label>
+                        </div>
+
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="SubscribeForm.Podcasts" id="Podcasts" />
+                            <label class="form-check-label" for="SubscribeForm.Podcasts">Podcasts</label>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+                <div id="form-group">
+
+                    <InputText @bind-Value="SubscribeForm.Email" class="form-control" placeholder="Your Email" />
+                    <i class="fa-regular fa-envelope"></i>
+
+
+                    <div class="button">
+                        <button type="submit" class="btn-theme">Subscribe *</button>
+                    </div>
+
+                </div>
+                <ValidationMessage For="@(() => SubscribeForm.Email)" class="alert-email" />
+
+            </div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            var statusClass = StatusMessage.ToLower().Trim() switch
+            {
+                "success" => "alert-success",
+                "alreadyexists" => "alert-dangerr",
+                "unauthorized" => "alert-dangerr",
+                "connectionfailed" => "alert-dangerr",
+                "invalid" => "alert-dangerr",
+                _ => null
+            };
+
+            if (statusClass != null)
+            {
+                <div id="formMessage" class="alert @statusClass">
+                    @switch (StatusMessage.ToLower().Trim())
+                    {
+                        case "success":
+                            <p>You have been subscribed</p>
+                            break;
+                        case "alreadyexists":
+                            <p>You have already subscribed</p>
+                            break;
+                        case "unauthorized":
+                            <p>Something went wrong. Please contact web admin.</p>
+                            break;
+                        case "connectionfailed":
+                            <p>Unable to contact the server. Please try again later.</p>
+                            break;
+                        case "invalid":
+                            <p>You must enter a valid email address</p>
+                            break;
+                        default:
+                            <p>An unknown error occurred.</p>
+                            break;
+                    }
+                </div>
+            }
+            else
+            {  
+                <p>@StatusMessage</p>
+            }
+        }
+    </div>
+
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public string? StatusMessage { get; set; }
+
+    [SupplyParameterFromForm]
+    public SubscribeFormModel SubscribeForm { get; set; } = new();
+
+
+
+    private void SetStatusMessage(string status)
+    {
+        StatusMessage = status;
+    }
+
+    protected override void OnInitialized()
+    {
+
+        SetStatusMessage("* Yes, I agree to the terms and privacy policy.");
+    }
+
+
+
+    private async Task OnValidSubmit()
+    {
+        var result = await Http.PostAsJsonAsync("https://newsletterprovider-win23jsbackend-KhadharA.azurewebsites.net/api/subscribe", SubscribeForm);
+        if (result.IsSuccessStatusCode)
+        {
+            StatusMessage = "success";
+        }
+    }
+
+}

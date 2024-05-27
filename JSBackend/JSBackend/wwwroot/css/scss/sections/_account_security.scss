@@ -1,0 +1,268 @@
+#account-security {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 50px;
+    margin-bottom: 70px;
+
+
+    @include lg {
+        grid-template-columns: 2fr 5fr;
+        gap: 150px;
+    }
+
+
+
+
+    aside {
+        border-bottom: 1px solid var(--color-gray-300);
+        padding-bottom: 30px;
+
+        @include lg {
+            border-right: 1px solid var(--color-gray-300);
+            padding-right: 20px;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+
+        .profile-info {
+            margin: 20px;
+            text-align: center;
+            position: relative;
+
+            .profile-img {
+                width: 120px;
+                height: 120px;
+                object-fit: cover;
+                position: relative;
+                border-radius: 50%;
+            }
+
+            .btn-refersh {
+                height: auto;
+                border: 1px solid var(--color-gray-400);
+                background-color: var(--color-gray-000);
+                border-radius: 50%;
+                padding: 4px 9px 2px 9px;
+                position: absolute;
+                top: 85px;
+                right: 155px;
+                cursor: pointer;
+                align-items: center;
+
+
+                @include md {
+                    top: 85px;
+                    right: 255px;
+                }
+
+                @include lg {
+                    top: 85px;
+                    right: 70px;
+                }
+
+                &:hover {
+                    background-color: var(--color-gray-800);
+                    color: var(--color-gray-000);
+                }
+            }
+
+            h5 {
+                margin-top: 15px;
+                margin-bottom: 0;
+            }
+
+            p {
+                @include text-m;
+            }
+        }
+
+        nav {
+            margin-top: 50px;
+            text-align: left;
+            display: flex;
+            justify-content: center;
+
+            @include lg {
+                display: initial;
+            }
+
+            .signout-buttons {
+                margin: 10px 0;
+                text-align: left;
+                justify-content: flex-start;
+
+
+                form {
+
+
+                    .btn-transparent {
+                        justify-content: left;
+
+                        span {
+                            display: none;
+
+                            @include lg {
+                                display: initial;
+                            }
+                        }
+                    }
+                }
+            }
+
+            a {
+                margin: 10px 0;
+                text-align: left;
+                justify-content: flex-start;
+
+                span {
+                    display: none;
+
+                    @include lg {
+                        display: initial;
+                    }
+                }
+            }
+
+            .btn-theme-s {
+                text-align: left;
+                justify-content: flex-start;
+            }
+
+            .btn-transparent {
+                text-align: left;
+                justify-content: flex-start;
+
+                span {
+                    display: none;
+
+                    @include lg {
+                        display: initial;
+                    }
+                }
+
+                &.active {
+                    @include theme-shadow;
+                    background: var(--color-theme);
+                    color: var(--color-white);
+                    padding-top: 10px;
+                    padding-bottom: 13px;
+                    border: none;
+
+                    &:hover {
+                        @include theme-secondary-shadow;
+                        text-decoration: none;
+                        background: var(--color-gray-700);
+                        color: var(--color-gray-000);
+                    }
+                }
+            }
+        }
+    }
+
+    .details {
+        margin-top: 50px;
+        width: 107%;
+
+
+        .security-password {
+
+            form {
+                padding: 1rem;
+
+                h5 {
+                    color: $theme;
+                }
+
+                .content {
+                    display: grid;
+                    gap: 1rem 2rem;
+                    grid-template-columns: 1fr 1rf;
+                    grid-template-areas: "current_password current_password" "new_password confirem" "buttons buttons";
+
+
+                    #form-current-password {
+                        grid-area: current_password;
+                        width: 48%;
+                    }
+
+                    #form-new-password {
+                        grid-area: new_password;
+                    }
+
+                    #form-confirem {
+                        grid-area: confirem;
+                    }
+
+                    .form-buttons {
+                        grid-area: buttons;
+                        margin: 20px 0;
+                        display: flex;
+                        gap: 20px;
+                    }
+                }
+            }
+        }
+
+
+        .security-delete {
+            margin-top: 30px;
+
+            form {
+                padding: 1rem;
+
+
+                h5 {
+                    color: var(--color-theme);
+                }
+
+                .content {
+                    display: grid;
+                    gap: 1rem 2rem;
+                    grid-template-rows: 1fr;
+                    grid-template-areas: "text" "delete" "buttons";
+
+
+                    #form-text {
+                        grid-area: text;
+
+                        p {
+                            color: var(--color-gray-700);
+                        }
+                    }
+
+                    #form-delete {
+                        grid-area: delete;
+                        padding: 1rem 0;
+
+                        .checkbox-group {
+
+
+                            &.input-validation-error {
+                                border: 0.063rem solid $danger !important;
+                                display: flex;
+                                flex-direction: column;
+                                color: $danger;
+
+                                &::placeholder {
+                                    color: $danger;
+                                }
+                            }
+                        }
+                    }
+
+
+
+
+
+                    .form-buttons {
+                        grid-area: buttons;
+                        margin: 20px 0;
+                        display: flex;
+                        gap: 20px;
+                    }
+                }
+            }
+        }
+    }
+}

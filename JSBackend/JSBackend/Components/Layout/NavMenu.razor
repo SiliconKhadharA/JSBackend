@@ -1,0 +1,51 @@
+﻿@page "/Account"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Antiforgery
+@inject NavigationManager NavigationManager
+@inject IAntiforgery Antiforgery
+
+<nav>
+    <NavLink class="btn-transparent" href="/Account/Details" Match="NavLinkMatch.All">
+        <i class="fa-regular fa-gear"></i><span>Account Details</span>
+    </NavLink>
+
+    <NavLink class="btn-transparent" href="/Account/Security">
+        <i class="fa-regular fa-lock"></i><span>Security</span>
+    </NavLink>
+
+    <NavLink class="btn-transparent" href="/Account/Notifications">
+        <i class="fa-regular fa-bell"></i><span>Notifications</span>
+    </NavLink>
+
+    <div class="signout-buttons">
+        <form action="/Account/Logout" method="post">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+            <button type="submit" class="btn-transparent">
+                <span class="fa-regular fa-arrow-right-from-bracket" aria-hidden="true"></span> Sign Out
+            </button>
+        </form>
+    </div>
+</nav>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

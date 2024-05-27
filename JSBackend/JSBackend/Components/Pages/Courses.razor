@@ -1,0 +1,81 @@
+﻿@page "/courses"
+@using Infrastructure.Models
+@attribute [StreamRendering]
+
+
+
+
+<PageTitle>Courses</PageTitle>
+
+<JSBackend.Components.Sections.CoursesLinks />
+<JSBackend.Components.Sections.CoursesSearchFilters />
+
+<section class="courses">
+	<div class="container">
+		<div class="course-content">
+			@if (courses == null) 
+			{
+				<p><em>No courses found yet. Loading.....</em></p>
+			}
+			else 
+			{
+				@foreach (var item in courses)
+				{
+					<div class="course" data-category="@((item.Category == null || item.Category == "") ? "other" : item.Category)">
+
+						@if (item.IsBestseller)
+						{
+							<div class="best-seller">Best Seller</div>
+						}
+						<img class="course-image" src="~/Images/Courses/@item.ImageName" />
+						<div class="content">
+							<a asp-action="Details" asp-controller="Courses" asp-route-id="@item.Id">
+								<h2 class="course-title">@item.Title</h2>
+							</a>
+							<div class="course-author">by @item.Author</div>
+							<div class="course-price">
+								@if (@item.DiscountPrice > 0)
+								{
+									<div class="dicount-price">$@item.DiscountPrice</div>
+									<div class="original-price discounted">$@item.OriginalPrice</div>
+								}
+								else
+								{
+									<div class="original-price">$@item.OriginalPrice</div>
+								}
+
+							</div>
+							<div class="course-footer">
+								<div class="course-hourse"><i class="fa-regular fa-clock"></i> @item.Hours hours</div>
+								<div class="course-likes">
+									<i class="fa-regular fa-thumbs-up"></i>
+									<span>@($"{item.LikesInProcent * 100:0}%")</span>
+									<span>@($"({(item.LikesInNumbers / 1000m):0.0}K)")</span>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
+</section>
+
+<JSBackend.Components.Sections.CoursesAd />
+
+@code {
+	private CourseModel[]? courses;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			courses = await Http.GetFromJsonAsync<CourseModel[]>(Environment.GetEnvironmentVariable("COURSES_APIURI"));
+		}
+		catch { }
+
+	}
+
+	
+}

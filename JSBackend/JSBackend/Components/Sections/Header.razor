@@ -1,0 +1,50 @@
+﻿<header>
+    <div class="container">
+        <a id="logo" href=""><img src="/Images/Logos/Silicon Logotype - Light Mode.svg" alt="Logotype for Silicon"></a>
+
+        <div id="menu" class="hide">
+            <nav>
+                <NavLink class="menu-link" href="" Match="NavLinkMatch.All">Overview</NavLink>
+                <NavLink class="menu-link" href="/#Features">Features</NavLink>
+               
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink class="menu-link" href="/courses">Courses</NavLink>
+                    </Authorized>
+                </AuthorizeView>
+                    
+                <NavLink class="menu-link" href="/contact">Contact</NavLink>
+            </nav>
+        </div>
+
+        
+
+
+
+        <AuthorizeView>
+
+            <Authorized>
+                <div id="user-profile" class="profile">
+                    <a href="/Account/Details">
+                        <img src="/Images/avatar.jpg" alt="User Image" id="user-img" />
+                    </a>
+                    
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div id="account-buttons" class="hide">
+                    <a id="b" class="btn-gray" href="/signin"><i class="fa-regular fa-right-to-bracket"></i><span>Sign In</span></a>
+                    <a id="c" class="btn-theme" href="/signup"><i class="fa-regular fa-user"></i><span>Sign Up</span></a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <button onclick="toggleMenu()" aria-label="Toggle menu" class="btn-mobilemenu">
+            <i class="fa-regular fa-bars"></i>
+        </button>
+    </div>
+
+
+
+
+</header>

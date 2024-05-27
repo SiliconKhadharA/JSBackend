@@ -1,0 +1,228 @@
+
+
+.subscribe {
+    background-image: linear-gradient(to left, var(--color-gray-100) var(--subscribe-gradient-percentage), transparent 0%);
+
+    @include lg {
+        background-image: linear-gradient(to left, var(--color-gray-100) var(--subscribe-gradient-percentage), transparent calc(100% - var(--subscribe-gradient-percentage)));
+    }
+
+    .container {
+        padding: 50px;
+
+        @include lg {
+            padding: 100px;
+        }
+
+        .content {
+            display: flex;
+            justify-content: start;
+
+            @include lg {
+                justify-content: flex-start;
+                margin-left: 110px;
+            }
+
+            img {
+                padding-left: 20px;
+                display: none;
+
+                @include lg {
+                    display: block;
+                }
+            }
+
+            h1 {
+                @include h2;
+
+                @include lg {
+                    @include h1;
+                }
+            }
+        }
+
+
+        .choose-newsletter {
+
+
+            .alert-email {
+                color: var(--color-danger-dark);
+                display: grid;
+                flex-direction: column;
+                align-items: center;
+                border-radius: 8px;
+                margin-left: 115px;
+                margin-right: 160px;
+            }
+
+            .checkbox {
+                display: grid;
+                grid-template-columns: 1fr;
+                padding-top: 25px;
+                padding-bottom: 35px;
+
+                @include lg {
+                    display: flex;
+                    justify-content: flex-start;
+                    margin-left: 110px;
+                    padding-top: 45px;
+                    padding-bottom: 64px;
+                }
+
+
+                h1 {
+                    @include h5;
+
+
+                    br {
+                        display: none;
+
+                        @include lg {
+                            display: block;
+                        }
+                    }
+
+                    @include lg {
+                        @include h4;
+                        min-width: 196px;
+                    }
+                }
+
+                .checkboxes {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 5px;
+
+                    @include lg {
+                        display: grid;
+                        grid-template-columns: auto 1fr auto;
+                        padding-left: 32px;
+                        gap: 5px;
+                    }
+
+                    .form-check {
+                        padding-top: 5px;
+                        min-width: 196px;
+
+
+
+                        .form-check-input[type = checkbox] {
+                            padding: 10px;
+                            border: 1px solid var(--color-gray-500);
+                            margin-right: 10px;
+                            cursor: pointer;
+                            display: inline-block;
+                            background-color: var(--color-gray-000);
+
+                            &:hover {
+                                background-color: var (--color-gray-500);
+                            }
+
+                            &:checked {
+                                background-color: $theme;
+                                color: $theme;
+                            }
+                        }
+
+                        .form-check-label {
+                            @include text-m;
+                        }
+                    }
+                }
+            }
+
+            #form-group {
+                display: flex;
+                position: relative;
+                align-items: center;
+                justify-content: flex-start;
+
+
+                @include lg {
+                    margin-left: 110px;
+                }
+
+                .form-control {
+                    width: 65%;
+                    padding-left: 35px;
+                    height: 49px;
+                    background-color: var(--color-gray-000);
+                    border: 1px solid var(--color-gray-200);
+
+                    &::placeholder {
+                        color: var(--color-gray-500);
+                        opacity: 1;
+                        background-color: var(--color-gray-000);
+                    }
+
+                    &.invalid {
+                        border: 1px solid var(--color-danger-dark);
+                    }
+                }
+
+                i {
+                    position: absolute;
+                    left: 13px;
+                    top: 32%;
+                    font-size: 18px;
+                    color: var(--color-gray-500);
+                }
+
+                span {
+                    color: $warning;
+                    padding-top: 5px;
+                }
+
+                .button {
+
+                    .btn-theme {
+                        height: 48px;
+                        width: 180px;
+                        @include theme-shadow;
+                    }
+
+                    padding-left: 15px;
+                }
+            }
+        }
+
+        p {
+            padding-top: 10px;
+            color: var(--color-gray-600);
+
+            span {
+                color: var(--span-color);
+            }
+
+            @include lg {
+                margin-left: 110px;
+            }
+
+            a {
+                text-decoration: underline;
+                color: $theme;
+            }
+        }
+
+
+        #formMessage {
+            p {
+                padding-top: 10px;
+                color: var(--color-gray-600);
+
+                span {
+                    color: var(--span-color);
+                }
+
+                @include lg {
+                    margin-left: 110px;
+                }
+
+                a {
+                    text-decoration: underline;
+                    color: $theme;
+                }
+            }
+        }
+    }
+}

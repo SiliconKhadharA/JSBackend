@@ -1,0 +1,39 @@
+#error {
+    
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding-top: 110px;
+
+            img {
+                width: 75%;
+            }
+
+            h1 {
+                padding-top: 50px;
+                @include d6;
+            }
+
+            p {
+               
+                padding-bottom: 25px;
+            }
+        }
+
+        nav {
+
+            a {
+            }
+        }
+    }
+}

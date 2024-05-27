@@ -1,0 +1,65 @@
+﻿@using Infrastructure.Entites
+@inject UserManager<UserEntity> UserManager
+@inject SignInManager<UserEntity> SignInManager
+@inject IHttpContextAccessor HttpContextAccessor
+@inject HttpClient Http
+@attribute [StreamRendering]
+
+
+
+@if (user == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <div class="profile-info">
+        <img src="/Images/uploads/@user.ProfileImage" alt="Profile Image" class="profile-img" />
+        <EditForm Model="@uploadedFile" OnValidSubmit="HandleProfileUpload" novalidate>
+            <InputFile id="upload" OnChange="OnInputFileChange" hidden />
+            <label for="upload" class="btn-refresh"><i class="fa-regular fa-refresh"></i></label>
+        </EditForm>
+        <h5>@($"{user.FirstName} {user.LastName}")</h5>
+        <p>@user.Email</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public UserEntity user { get; set; } = default!;
+    private MultipartFormDataContent uploadedFile { get; set; } = new MultipartFormDataContent();
+    private IBrowserFile? selectedFile;
+
+ 
+
+   
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    public async Task HandleProfileUpload()
+    {
+        if (selectedFile != null && user != null)
+        {
+            using var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(selectedFile!.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10)); // Limit to 10 MB
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
+
+            content.Add(fileContent, "file", selectedFile.Name);
+
+            var response = await Http.PostAsync(Environment.GetEnvironmentVariable("UPLOAD_APIURI"), content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                user.ProfileImage = await response.Content.ReadAsStringAsync();
+                var result = await UserManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    await SignInManager.RefreshSignInAsync(user);
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+}

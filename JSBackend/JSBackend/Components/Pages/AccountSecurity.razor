@@ -1,0 +1,194 @@
+﻿@page "/Account/Security"
+
+@using Infrastructure.Entites
+@using JSBackend.Client.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<UserEntity> SignInManager
+@inject NavigationManager NavigationManager
+@inject ILogger<AccountSecurity> Logger
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+
+<PageTitle>Security</PageTitle>
+
+<div class="container">
+	<section id="account-security">
+		<aside>
+			<JSBackend.Components.Sections.ProfileInfoAvtar user="user" />
+			<JSBackend.Components.Layout.NavMenu />
+		</aside>
+		<div class="details">
+			<section class="security-password">
+				@if (!string.IsNullOrEmpty(ErrorMessage))
+				{
+					<div class="alert-2">
+						@ErrorMessage
+					</div>
+				}
+				@if (!string.IsNullOrEmpty(SuccessMessage))
+				{
+					<div class="alert-3">
+						@SuccessMessage
+					</div>
+				}
+				<EditForm Model="@Security" OnValidSubmit="HandleUpdatePassword" FormName="change-password-form" novalidate>
+
+					<h2>Security</h2>
+					<h5>Password</h5>
+
+					<div class="content">
+						<div id="form-current-password" class="input-group">
+							<label for="current-password">Current password</label>
+							<ValidationMessage For="() => Security.CurrentPassword" />
+							<InputText type="password" @bind-Value="Security.CurrentPassword" id="current-password" placeholder="Enter your Current password" />
+						</div>
+						<div id="form-new-password" class="input-group">
+							<label for="new-password">New password</label>
+							<ValidationMessage For="() => Security.NewPassword" />
+							<InputText type="password" @bind-Value="Security.NewPassword" id="new-password" placeholder="Enter your new Password" />
+						</div>
+						<div id="form-confirm" class="input-group">
+							<label for="confirm-password">Confirm new password</label>
+							<ValidationMessage For="() => Security.ConfirmPassword" />
+							<InputText type="password" @bind-Value="Security.ConfirmPassword" id="confirm-password" placeholder="Confirm your new password" />
+						</div>
+						<div class="form-buttons">
+							<button class="btn-gray" type="reset">Cancel</button>
+							<button class="btn-theme" type="submit">Change password</button>
+						</div>
+					</div>
+				</EditForm>
+			</section>
+			<hr />
+			<section class="security-delete">
+				<EditForm Model="@Delete" OnValidSubmit="HandleDeleteUser" FormName="delete-account-form" novalidate>
+					<h5>"Delete account"</h5>
+
+					<div class="content">
+
+						<div id="form-text">
+							<p>"When you delete your account, your public profile will be deactivated immediately. 
+								If you change your mind before the 14 days are up, sign in with your email and password, 
+								and we’ll send you a link to reactivate your account."</p>
+						</div>
+
+
+						<div id="form-delete" class="checkbox">
+							<div class="checkbox-group">
+								<InputCheckbox @bind-Value="Delete.DeleteAccount" />
+								<label for="Delete!.DeleteAccount">Confirm new password</label>
+							</div>
+							<ValidationMessage For="() => Delete.DeleteAccount" />
+						</div>
+						<div class="form-buttons">
+							<button class="btn-danger" type="submit">Delete</button>
+						</div>
+					</div>
+				</EditForm>
+			</section>
+
+		</div>
+	</section>
+</div>
+@code {
+	[SupplyParameterFromForm]
+	private UserEntity user { get; set; } = default!;
+	[SupplyParameterFromForm]
+	private AccountSecurityModel Security { get; set; } = new();
+	private AccountSecurityDelete Delete { get; set; } = new AccountSecurityDelete();
+	private string? ErrorMessage { get; set; }
+	private string? SuccessMessage { get; set; }
+
+	[Inject] private UserManager<UserEntity> UserManager { get; set; } = null!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var httpContext = HttpContextAccessor!.HttpContext;
+		if (httpContext != null)
+		{
+			user = await UserManager.GetUserAsync(httpContext.User) ?? null!;
+		}
+
+		var uri = new Uri(NavigationManager.Uri);
+		var queryParameters = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+		if (queryParameters.TryGetValue("successMessage", out var successMessage))
+		{
+			SuccessMessage = successMessage;
+		}
+	}
+
+
+	private async Task HandleUpdatePassword()
+	{
+
+
+		var httpContext = HttpContextAccessor.HttpContext;
+		var user = await UserManager.GetUserAsync(httpContext.User);
+
+		
+		if (string.IsNullOrEmpty(Security.CurrentPassword))
+		{
+			ErrorMessage = "Current password is required.";
+			return;
+		}
+
+		if (string.IsNullOrEmpty(Security.NewPassword))
+		{
+			ErrorMessage = "New password is required.";
+			return;
+		}
+
+		var checkPassword = await UserManager.CheckPasswordAsync(user, Security.CurrentPassword);
+		if (!checkPassword)
+		{
+			ErrorMessage = "Current password is incorrect.";
+			return;
+		}
+
+		var result = await UserManager.ChangePasswordAsync(user, Security.CurrentPassword, Security.NewPassword);
+
+		if (result.Succeeded)
+		{
+			await SignInManager.RefreshSignInAsync(user);
+			NavigationManager.NavigateTo("/Account/Security?successMessage=Password updated successfully.", forceLoad: true);
+		}
+		else
+		{
+			ErrorMessage = "Unable to change password.";
+			foreach (var error in result.Errors)
+			{
+				ErrorMessage += $" {error.Description}";
+			}
+		}
+	}
+
+	private async Task HandleDeleteUser()
+	{
+		if (user == null)
+		{
+			ErrorMessage = "User not found.";
+			return;
+		}
+
+		var result = await UserManager.DeleteAsync(user);
+
+		if (result.Succeeded)
+		{
+			await SignInManager.SignOutAsync();
+			ErrorMessage = "Account deleted successfully.";
+			NavigationManager.NavigateTo("/signin", forceLoad: true);
+		}
+		else
+		{
+			foreach (var error in result.Errors)
+			{
+				Logger.LogError("Error deleting account: {0}", error.Description);
+			}
+		}
+	}
+
+}
