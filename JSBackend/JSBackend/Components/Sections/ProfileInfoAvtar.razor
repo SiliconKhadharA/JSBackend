@@ -3,6 +3,7 @@
 @inject SignInManager<UserEntity> SignInManager
 @inject IHttpContextAccessor HttpContextAccessor
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 @attribute [StreamRendering]
 
 
@@ -14,28 +15,31 @@
 else
 {
     <div class="profile-info">
-        <img src="/Images/uploads/@user.ProfileImage" alt="Profile Image" class="profile-img" />
-        <EditForm Model="@uploadedFile" OnValidSubmit="HandleProfileUpload" novalidate>
-            <InputFile id="upload" OnChange="OnInputFileChange" hidden />
-            <label for="upload" class="btn-refresh"><i class="fa-regular fa-refresh"></i></label>
+        <img src="/Images/avatar.jpg" alt="Profile Image" class="profile-img" />
+        <EditForm enctype="multipart/form-data" Model="@user" OnSubmit="HandleProfileUpload" FormName="ProfileUpload" novalidate>
+            <InputFile type="file" name="file" accept="image/*" OnChange="OnInputFileChange"  hidden/>
+            <label type="submit" class="btn-refresh"><i class="fa-regular fa-refresh"></i></label>
+           
         </EditForm>
         <h5>@($"{user.FirstName} {user.LastName}")</h5>
         <p>@user.Email</p>
     </div>
 }
 
+
+
 @code {
     [Parameter]
     public UserEntity user { get; set; } = default!;
-    private MultipartFormDataContent uploadedFile { get; set; } = new MultipartFormDataContent();
     private IBrowserFile? selectedFile;
 
  
 
    
-    private void OnInputFileChange(InputFileChangeEventArgs e)
+    private async void OnInputFileChange(InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
+        await JSRuntime.InvokeVoidAsync("submitForm", "ProfileUploadForm");
     }
 
     public async Task HandleProfileUpload()
@@ -43,7 +47,7 @@ else
         if (selectedFile != null && user != null)
         {
             using var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(selectedFile!.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10)); // Limit to 10 MB
+            var fileContent = new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10)); // Limit to 10 MB
             fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
 
             content.Add(fileContent, "file", selectedFile.Name);
@@ -52,14 +56,23 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                user.ProfileImage = await response.Content.ReadAsStringAsync();
-                var result = await UserManager.UpdateAsync(user);
-                if (result.Succeeded)
+                var responseData = await response.Content.ReadFromJsonAsync<ResponseData>();
+                if (responseData != null && !string.IsNullOrEmpty(responseData.FileUrl))
                 {
-                    await SignInManager.RefreshSignInAsync(user);
-                    StateHasChanged();
+                    user.ProfileImage = responseData.FileUrl;
+                    var result = await UserManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        await SignInManager.RefreshSignInAsync(user);
+                        StateHasChanged();
+                    }
                 }
             }
         }
+    }
+
+    private class ResponseData
+    {
+        public string? FileUrl { get; set; }
     }
 }

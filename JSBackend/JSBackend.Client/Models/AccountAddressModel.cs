@@ -4,6 +4,9 @@ namespace JSBackend.Client.Models;
 
 public class AccountAddressModel
 {
+
+    public int? Id { get; set; }
+
     [Display(Name = "Address Line 1", Prompt = "Enter your address line", Order = 0)]
     [Required(ErrorMessage = "Address is required")]
 

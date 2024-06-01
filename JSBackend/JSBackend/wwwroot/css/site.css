@@ -588,10 +588,10 @@ form .validation-message {
   height: 0;
 }
 .btn-switch .switch input:checked + .slider {
-  background-color: #6366F1;
+  background-color: #22C55E;
 }
 .btn-switch .switch input:focus + .slider {
-  box-shadow: 0 0 1px #6366F1;
+  box-shadow: 0 0 1px #22C55E;
 }
 .btn-switch .switch input:checked + .slider:before {
   transform: translateX(20px);
@@ -3898,4 +3898,186 @@ footer .container .social-media {
 .creator-profile .container .content .text .btn-facebook i {
   color: #FFFFFF;
   padding-right: 8px;
+}
+
+#account-notifications {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 50px;
+  margin-bottom: 70px;
+}
+@media (min-width: 992px) {
+  #account-notifications {
+    grid-template-columns: 2fr 5fr;
+    gap: 150px;
+  }
+}
+#account-notifications aside {
+  border-bottom: 1px solid var(--color-gray-300);
+  padding-bottom: 30px;
+}
+@media (min-width: 992px) {
+  #account-notifications aside {
+    border-right: 1px solid var(--color-gray-300);
+    padding-right: 20px;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+#account-notifications aside .profile-info {
+  margin: 20px;
+  text-align: center;
+  position: relative;
+}
+#account-notifications aside .profile-info .profile-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  position: relative;
+  border-radius: 50%;
+}
+#account-notifications aside .profile-info .btn-refersh {
+  height: auto;
+  border: 1px solid var(--color-gray-400);
+  background-color: var(--color-gray-000);
+  border-radius: 50%;
+  padding: 4px 9px 2px 9px;
+  position: absolute;
+  top: 85px;
+  right: 155px;
+  cursor: pointer;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  #account-notifications aside .profile-info .btn-refersh {
+    top: 85px;
+    right: 255px;
+  }
+}
+@media (min-width: 992px) {
+  #account-notifications aside .profile-info .btn-refersh {
+    top: 85px;
+    right: 70px;
+  }
+}
+#account-notifications aside .profile-info .btn-refersh:hover {
+  background-color: var(--color-gray-800);
+  color: var(--color-gray-000);
+}
+#account-notifications aside .profile-info h5 {
+  margin-top: 15px;
+  margin-bottom: 0;
+}
+#account-notifications aside .profile-info p {
+  line-height: 160%;
+  font-weight: 400;
+  color: var(--color-gray-700);
+  font-family: "Manrope", sans-serif;
+  font-size: 16px !important;
+}
+#account-notifications aside nav {
+  margin-top: 50px;
+  text-align: left;
+  display: flex;
+  justify-content: center;
+}
+@media (min-width: 992px) {
+  #account-notifications aside nav {
+    display: initial;
+  }
+}
+#account-notifications aside nav .signout-buttons {
+  margin: 10px 0;
+  text-align: left;
+  justify-content: flex-start;
+}
+#account-notifications aside nav .signout-buttons form .btn-transparent {
+  justify-content: left;
+}
+#account-notifications aside nav .signout-buttons form .btn-transparent span {
+  display: none;
+}
+@media (min-width: 992px) {
+  #account-notifications aside nav .signout-buttons form .btn-transparent span {
+    display: initial;
+  }
+}
+#account-notifications aside nav a {
+  margin: 10px 0;
+  text-align: left;
+  justify-content: flex-start;
+}
+#account-notifications aside nav a span {
+  display: none;
+}
+@media (min-width: 992px) {
+  #account-notifications aside nav a span {
+    display: initial;
+  }
+}
+#account-notifications aside nav .btn-theme-s {
+  text-align: left;
+  justify-content: flex-start;
+}
+#account-notifications aside nav .btn-transparent {
+  text-align: left;
+  justify-content: flex-start;
+}
+#account-notifications aside nav .btn-transparent span {
+  display: none;
+}
+@media (min-width: 992px) {
+  #account-notifications aside nav .btn-transparent span {
+    display: initial;
+  }
+}
+#account-notifications aside nav .btn-transparent.active {
+  box-shadow: 0px 8px 18px -8px rgba(99, 102, 241, 0.9);
+  background: var(--color-theme);
+  color: var(--color-white);
+  padding-top: 10px;
+  padding-bottom: 13px;
+  border: none;
+}
+#account-notifications aside nav .btn-transparent.active:hover {
+  box-shadow: 0px 8px 18px -8px rgba(19, 16, 34, 0.15);
+  text-decoration: none;
+  background: var(--color-gray-700);
+  color: var(--color-gray-000);
+}
+#account-notifications .details {
+  margin-top: 50px;
+  width: 107%;
+}
+#account-notifications .details .notifications-section form {
+  padding: 1rem;
+}
+#account-notifications .details .notifications-section form h5 {
+  color: #6366F1;
+}
+#account-notifications .details .notifications-section form .content {
+  display: grid;
+  padding-top: 20px;
+  gap: 1rem 2rem;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "email email" "subscribe-switch subscribe-switch" "theme-switch theme-switch" "buttons buttons";
+}
+#account-notifications .details .notifications-section form .content #form-noti-email {
+  grid-area: email;
+  width: 48%;
+}
+#account-notifications .details .notifications-section form .content #subscribe-switch {
+  padding-top: 25px;
+  grid-area: subscribe-switch;
+}
+#account-notifications .details .notifications-section form .content #theme-switch {
+  padding-top: 25px;
+  grid-area: theme-switch;
+}
+#account-notifications .details .notifications-section form .content .form-buttons {
+  padding-top: 50px;
+  grid-area: buttons;
+  margin: 20px 0;
+  display: flex;
+  gap: 20px;
 }

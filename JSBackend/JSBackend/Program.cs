@@ -3,6 +3,7 @@ using Infrastructure.Entites;
 using JSBackend.Components.Pages.Account.Shared;
 using JSBackend.Components;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<AddressService>();
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<UserEntity>(options => options.SignIn.RequireConfirmedAccount = false)

@@ -1,9 +1,161 @@
 ﻿@page "/Account/Notifications"
+@using Infrastructure.Contexts
+@using Infrastructure.Entites
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http
+@inject UserManager<UserEntity> UserManager
+@inject IHttpContextAccessor HttpContextAccessor
+@inject HttpClient Http
+@inject DataContext DbContext
 
 
+
+
+
+<PageTitle>Account Notifications</PageTitle>
+
+<div class="container">
+	<section id="account-notifications">
+		<aside>
+			<JSBackend.Components.Sections.ProfileInfoAvtar user="user" />
+			<JSBackend.Components.Layout.NavMenu />
+		</aside>
+		<div class="details">
+			<section class="notifications-section">
+				@if (!string.IsNullOrEmpty(ErrorMessage))
+				{
+					<div class="alert-2">
+						@ErrorMessage
+					</div>
+				}
+				@if (!string.IsNullOrEmpty(SuccessMessage))
+				{
+					<div class="alert-3">
+						@SuccessMessage
+					</div>
+				}
+				<EditForm Model="@userSettings" OnValidSubmit="SaveSettings" FormName="savesettings">
+
+					<h2>Notifications</h2>
+					
+
+					<div class="content">
+							<div id="form-noti-email" class="input-group">
+								<label for="email">Preferred email for notifications</label>
+								<InputText type="email" @bind-Value="userSettings.Email" id="email" placeholder="Enter your email" />
+							</div>
+					
+
+						<div id="subscribe-switch" class="btn-switch">
+							<label class="switch" >
+								<InputCheckbox type="checkbox" @bind-Value="userSettings.IsSubscribed"  />
+								<span class="slider round"></span>
+							</label>
+							<div>
+								<h6>Subscribe to Newsletter</h6>
+								<p>Nec, posuere non felis duis massa vitae aliquet interdum scelerisque. Neque ullamcorper.</p>
+							</div>
+							
+						</div>
+
+						<div id="theme-switch" class="btn-switch">
+							<label class="switch">
+								<InputCheckbox type="checkbox" @bind-Value="userSettings.IsDarkMode"  />
+								<span class="slider round"></span>
+							</label>
+							<div>
+								<h6>Use Dark Mode Theme in Application</h6>
+								<p>Tortor massa porttitor enim tristique neque fermentum sed.</p>
+							</div>
+						</div>
+
+						<div class="form-buttons">
+							<button class="btn-gray" type="reset">Cancel</button>
+							<button class="btn-theme" type="submit">Save changes</button>
+						</div>
+
+					</div>
+				</EditForm>
+			</section>
+		</div>
+	</section>
+</div>
 
 
 
 @code {
+    private UserEntity? user;
+    private UserSettings userSettings = new UserSettings();
+    private string? ErrorMessage { get; set; }
+    private string? SuccessMessage { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        var httpContext = HttpContextAccessor.HttpContext;
+        if (httpContext != null)
+        {
+            user = await UserManager.GetUserAsync(httpContext.User);
+        }
+
+        if (user != null)
+        {
+            userSettings.Email = user.Email!;
+            userSettings.IsSubscribed = await GetSubscriptionStatusAsync(user.Email!);
+        }
+    }
+
+    private async Task SaveSettings()
+    {
+        if (!userSettings.IsSubscribed)
+        {
+            await SubscribeUser();
+        }
+        else
+        {
+            await UnsubscribeUser();
+        }
+    }
+
+    private async Task SubscribeUser()
+    {
+        var request = new { Email = userSettings.Email };
+
+        var response = await Http.PostAsJsonAsync("http://localhost:7081/api/Subscribe", request);
+        if (response.IsSuccessStatusCode)
+        {
+            SuccessMessage = "You have been subscribed.";
+        }
+        else
+        {
+            ErrorMessage = "There was an error subscribing.";
+        }
+    }
+
+    private async Task UnsubscribeUser()
+    {
+        var request = new { Email = userSettings.Email };
+
+        var response = await Http.PostAsJsonAsync("http://localhost:7081/api/Unsubscribe", request);
+        if (response.IsSuccessStatusCode)
+        {
+            SuccessMessage = "You have been unsubscribed.";
+        }
+        else
+        {
+            ErrorMessage = "There was an error unsubscribing.";
+        }
+    }
+
+    private async Task<bool> GetSubscriptionStatusAsync(string email)
+    {
+        var response = await Http.GetAsync($"http://localhost:7081/api/subscription/{email}");
+        return await response.Content.ReadFromJsonAsync<bool>();
+    }
+
+    public class UserSettings
+    {
+        public string Email { get; set; } = null!;
+        public bool IsSubscribed { get; set; }
+        public bool IsDarkMode { get; set; }
+    }
 }

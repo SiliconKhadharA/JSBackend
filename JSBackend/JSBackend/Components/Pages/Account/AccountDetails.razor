@@ -1,12 +1,13 @@
 ﻿@page "/Account/Details"
 @using Infrastructure.Entites
+@using Infrastructure.Services
 @using JSBackend.Client.Models
 @using JSBackend.Client.ViewModel
 @inject UserManager<UserEntity> UserManager
 @inject SignInManager<UserEntity> SignInManager
 @inject IHttpContextAccessor HttpContextAccessor
 @inject HttpClient Http
-
+@inject AddressService AddressService
 
 <PageTitle>Details</PageTitle>
 
@@ -19,7 +20,7 @@
         </aside>
         <div class="details">
             <section class="basic-info">
-                <EditForm Model="@basicInfo" OnValidSubmit="HandleValidSubmit" novalidate>
+                <EditForm Model="@basicInfo" OnValidSubmit="HandleValidSubmit" FormName="HandleValidSubmit" novalidate>
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -61,7 +62,7 @@
             </section>
             <hr />
             <section class="address-info">
-                <EditForm Model="@address" OnValidSubmit="HandleAddressUpdate">
+                <EditForm Model="@address" OnValidSubmit="HandleAddressUpdate" FormName="HandleAddressUpdate" novalidate>
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -113,12 +114,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var httpContext = HttpContextAccessor!.HttpContext;
+        var httpContext = HttpContextAccessor?.HttpContext;
         if (httpContext != null)
         {
-            user = await UserManager.GetUserAsync(httpContext.User) ?? null!;
+            user = await UserManager.GetUserAsync(httpContext.User);
             if (user != null)
             {
+                // Initialize basic info model
                 basicInfo = new BasicInfoModel
                     {
                         FirstName = user.FirstName,
@@ -128,10 +130,20 @@
                         Biography = user.Bio
                     };
 
-                var userAddress = user.Addresses.FirstOrDefault();
-                if (userAddress != null)
+                // Initialize address model if user has addresses
+                if (user.Addresses != null && user.Addresses.Any())
                 {
-                    address = userAddress;
+                    var userAddress = user.Addresses.FirstOrDefault(a => a.Id == address?.Id);
+                    if (userAddress != null)
+                    {
+                        address = new AddressEntity
+                            {
+                                AddressLine_1 = userAddress.AddressLine_1,
+                                AddressLine_2 = userAddress.AddressLine_2,
+                                PostalCode = userAddress.PostalCode,
+                                City = userAddress.City
+                            };
+                    }
                 }
             }
         }
@@ -163,7 +175,9 @@
     {
         if (user != null)
         {
-            var userAddress = user.Addresses.FirstOrDefault(a => a.Id == address.Id);
+            var userAddress = await AddressService.GetAddressAsync(user.Id);
+            bool result;
+
             if (userAddress != null)
             {
                 // Update existing address
@@ -171,24 +185,25 @@
                 userAddress.AddressLine_2 = address.AddressLine_2;
                 userAddress.PostalCode = address.PostalCode;
                 userAddress.City = address.City;
+
+                result = await AddressService.UpdateAddressAsync(userAddress);
             }
             else
             {
-                // Add new address
-                user.Addresses.Add(new AddressEntity
+                // Create new address
+                var newAddress = new AddressEntity
                     {
+                        UserId = user.Id,
                         AddressLine_1 = address.AddressLine_1,
                         AddressLine_2 = address.AddressLine_2,
                         PostalCode = address.PostalCode,
-                        City = address.City,
-                        UserId = user.Id,
-                        User = user
-                    });
+                        City = address.City
+                    };
+
+                result = await AddressService.CreateAddressAsync(newAddress);
             }
 
-            var result = await UserManager.UpdateAsync(user);
-
-            if (result.Succeeded)
+            if (result)
             {
                 uploadMessage = "Address updated successfully!";
             }

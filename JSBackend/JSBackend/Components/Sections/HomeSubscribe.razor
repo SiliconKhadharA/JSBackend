@@ -141,7 +141,7 @@
 
     private async Task OnValidSubmit()
     {
-        var result = await Http.PostAsJsonAsync("https://newsletterprovider-win23jsbackend-KhadharA.azurewebsites.net/api/subscribe", SubscribeForm);
+        var result = await Http.PostAsJsonAsync("http://localhost:7081/api/Subscribe", SubscribeForm);
         if (result.IsSuccessStatusCode)
         {
             StatusMessage = "success";

@@ -179,7 +179,7 @@
 		if (result.Succeeded)
 		{
 			await SignInManager.SignOutAsync();
-			ErrorMessage = "Account deleted successfully.";
+			SuccessMessage = "Account deleted successfully.";
 			NavigationManager.NavigateTo("/signin", forceLoad: true);
 		}
 		else

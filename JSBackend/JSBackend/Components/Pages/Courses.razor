@@ -1,5 +1,6 @@
 ﻿@page "/courses"
 @using Infrastructure.Models
+@using System.Text.Json
 @attribute [StreamRendering]
 
 
@@ -27,11 +28,11 @@
 						{
 							<div class="best-seller">Best Seller</div>
 						}
-						<img class="course-image" src="~/Images/Courses/@item.ImageName" />
+						<img class="course-image" src="/Images/Courses/@item.ImageUri" />
 						<div class="content">
-							<a asp-action="Details" asp-controller="Courses" asp-route-id="@item.Id">
+							<NavLink href=@($"/courses/{item.Id}")>
 								<h2 class="course-title">@item.Title</h2>
-							</a>
+							</NavLink>
 							<div class="course-author">by @item.Author</div>
 							<div class="course-price">
 								@if (@item.DiscountPrice > 0)
@@ -41,7 +42,7 @@
 								}
 								else
 								{
-									<div class="original-price">$@item.OriginalPrice</div>
+									<div class="original-price">@($"{item.OriginalPrice}")</div>
 								}
 
 							</div>
@@ -49,8 +50,8 @@
 								<div class="course-hourse"><i class="fa-regular fa-clock"></i> @item.Hours hours</div>
 								<div class="course-likes">
 									<i class="fa-regular fa-thumbs-up"></i>
-									<span>@($"{item.LikesInProcent * 100:0}%")</span>
-									<span>@($"({(item.LikesInNumbers / 1000m):0.0}K)")</span>
+									<span>@($"{item.LikesInProcent }")</span>
+									<span>@($"({(item.LikesInNumbers ):0.0})")</span>
 
 								</div>
 							</div>
@@ -65,16 +66,47 @@
 <JSBackend.Components.Sections.CoursesAd />
 
 @code {
-	private CourseModel[]? courses;
+	private List<CourseModel>? courses;
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
-			courses = await Http.GetFromJsonAsync<CourseModel[]>(Environment.GetEnvironmentVariable("COURSES_APIURI"));
-		}
-		catch { }
+			var query = new GraphQLQuery { Query = "{getCourses { id isBestseller categories title authors{name} imageUri prices{price currency discount} likes likesInProcent hours } }" };
+			var response = await Http.PostAsJsonAsync("http://localhost:7186/api/graphql", query);
 
+			if (response.IsSuccessStatusCode)
+			{
+				var jsonResponse = await response.Content.ReadAsStringAsync();
+				Console.WriteLine($"GraphQL Response: {jsonResponse}");
+				var result = await response.Content.ReadFromJsonAsync<DynamicGraphQLResponse>();
+				if (result?.Data.ValueKind == JsonValueKind.Object && result.Data.TryGetProperty("getCourses", out JsonElement coursesElement))
+				{
+					courses = coursesElement.EnumerateArray()
+						.Select(course => new CourseModel
+							{
+								Id = course.GetProperty("id").GetString(),
+								IsBestseller = course.GetProperty("isBestseller").GetBoolean(),
+								ImageUri = course.GetProperty("imageUri").GetString(),
+								Title = course.GetProperty("title").GetString(),
+								Author = course.GetProperty("authors")[0].GetProperty("name").GetString(),
+								OriginalPrice = course.GetProperty("prices").GetProperty("price").GetDecimal(),
+								DiscountPrice = course.GetProperty("prices").GetProperty("discount").GetDecimal(),
+								Hours = course.GetProperty("hours").GetInt32(),
+								LikesInNumbers = course.GetProperty("likes").GetString(),
+								LikesInProcent = course.GetProperty("likesInProcent").GetString(),
+								Category = course.TryGetProperty("categories", out JsonElement categoriesElement) && categoriesElement.ValueKind == JsonValueKind.Array && categoriesElement.GetArrayLength() > 0
+									? categoriesElement[0].GetString()
+									: "Other"
+							}).ToList();
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			
+			Console.WriteLine($"An error occurred: {ex.Message}");
+		}
 	}
 
 	

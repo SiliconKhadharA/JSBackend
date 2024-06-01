@@ -92,11 +92,11 @@
             height: 0;
 
             &:checked + .slider {
-                background-color: $theme;
+                background-color: $success;
             }
 
             &:focus + .slider {
-                box-shadow: 0 0 1px $theme;
+                box-shadow: 0 0 1px $success;
             }
 
             &:checked + .slider:before {

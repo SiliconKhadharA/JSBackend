@@ -3,11 +3,11 @@ namespace Infrastructure.Models
 {
     public class CourseModel
     {
-        public string Id { get; set; } = null!;
+        public string? Id { get; set; }
 
-        public string Title { get; set; } = null!;
+        public string? Title { get; set; }
 
-        public string? ImageName { get; set; }
+        public string? ImageUri { get; set; }
 
         public string? Author { get; set; }
 
@@ -19,10 +19,10 @@ namespace Infrastructure.Models
 
         public decimal DiscountPrice { get; set; }
 
-        public decimal LikesInProcent { get; set; }
+        public string? LikesInProcent { get; set; }
 
-        public decimal LikesInNumbers { get; set; }
+        public string? LikesInNumbers { get; set; }
 
         public string? Category { get; set; }
-    }
+    } 
 }
